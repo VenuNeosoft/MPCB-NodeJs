@@ -19,7 +19,10 @@ connectDB();
 
 const app = express();
 app.use(express.json());
-
+app.get('/', (req, res) => {
+    res.send('Welcome to our site');
+  });
+  
 // Routes
 app.use('/api/users', createUserRoute);
 app.use('/api/users', getUserRoute);
