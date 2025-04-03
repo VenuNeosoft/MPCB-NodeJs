@@ -1,6 +1,7 @@
 const User = require('../models/userModel');
 const jwt = require('jsonwebtoken');
-
+const {sendOtpEmail} = require('../utils/emailService');
+const TempUser = require('../models/tempUserModel'); 
 // @desc Generate JWT Token for Authentication
 const generateToken = (id) => {
   return jwt.sign({ id }, process.env.JWT_SECRET, {
@@ -13,48 +14,72 @@ const generateToken = (id) => {
 const createUser = async (req, res) => {
   const { name, email, password, role } = req.body;
 
-  // Check if all fields are provided
   if (!name || !email || !password || !role) {
-    res.status(400).json({ message: 'All fields are required' });
-    return;
+    return res.status(400).json({ message: 'All fields are required' });
   }
 
-  // Validate allowed roles
   const validRoles = ['citizen', 'field', 'supervisor'];
   if (!validRoles.includes(role)) {
-    res.status(400).json({ message: 'Invalid role specified' });
-    return;
+    return res.status(400).json({ message: 'Invalid role' });
   }
 
   // Check if user already exists
   const userExists = await User.findOne({ email });
   if (userExists) {
-    res.status(400).json({ message: 'User already exists' });
-    return;
+    return res.status(400).json({ message: 'User already exists' });
   }
 
-  // Create a new user with role
-  const user = await User.create({
-    name,
-    email,
-    password,
-    role, // Add role to the user
-  });
+  // Generate OTP
+  const otp = Math.floor(100000 + Math.random() * 900000).toString();
 
-  if (user) {
-    // Generate token and return response
-    const token = generateToken(user._id);
+  // Store in temporary collection instead of creating the user
+  await TempUser.findOneAndUpdate(
+    { email },
+    { name, email, password, role, otp, otpExpires: Date.now() + 10 * 60 * 1000 },
+    { upsert: true, new: true }
+  );
 
-    res.status(201).json({
-      _id: user.id,
-      name: user.name,
-      email: user.email,
-      role: user.role, // Return role in response
-      token,
-    });
-  } else {
-    res.status(400).json({ message: 'Failed to create user' });
-  }
+  // Send OTP email
+  await sendOtpEmail(email, otp);
+
+  res.status(201).json({ message: 'OTP sent. Please verify to complete registration.',otp:otp });
 };
 
-module.exports = createUser;
+// Verify OTP and activate user
+const verifyOtp = async (req, res) => {
+  const { email, otp } = req.body;
+
+  const tempUser = await TempUser.findOne({ email });
+
+  if (!tempUser) {
+    return res.status(400).json({ message: 'User not found or OTP expired' });
+  }
+
+  if (tempUser.otp !== otp || tempUser.otpExpires < Date.now()) {
+    return res.status(400).json({ message: 'Invalid or expired OTP' });
+  }
+
+  // Create user in actual collection
+  const user = await User.create({
+    name: tempUser.name,
+    email: tempUser.email,
+    password: tempUser.password,
+    role: tempUser.role,
+    isVerified: true,
+  });
+
+  // Remove temp user entry
+  await TempUser.deleteOne({ email });
+
+  // Generate token
+  const token = generateToken(user._id);
+
+  res.status(200).json({
+    _id: user.id,
+    name: user.name,
+    email: user.email,
+    role: user.role,
+    token,
+  });
+};
+module.exports = { createUser, verifyOtp };

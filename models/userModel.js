@@ -6,6 +6,8 @@ const userSchema = mongoose.Schema(
       type: String,
       required: [true, 'Please add a name'],
     },
+
+  
     email: {
       type: String,
       required: [true, 'Please add an email'],
@@ -19,6 +21,16 @@ const userSchema = mongoose.Schema(
       type: String,
       enum: ['citizen', 'field', 'supervisor'],
       required: true,
+    },
+    otp: {
+      type: String,
+    },
+    otpExpires: {
+      type: Date,
+    },
+    isVerified: {
+      type: Boolean,
+      default: false,
     },
     token: {
       type: String,

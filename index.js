@@ -1,5 +1,7 @@
 const express = require('express');
 const dotenv = require('dotenv');
+require('dotenv').config();
+
 const connectDB = require('./config/db');
 // const seedServices = require('./config/seedServices');
 const colors = require('colors');
@@ -15,6 +17,8 @@ const userRoutes = require('./routes/userRoutes');
 
 dotenv.config();
 connectDB();
+console.log('Email User:', process.env.EMAIL_USER);
+console.log('Email Pass:', process.env.EMAIL_PASS);
 
 
 const app = express();
