@@ -14,7 +14,6 @@ const complaintRoutes = require('./routes/complaintRoutes');
 const path = require('path');
 const serviceRoute = require('./routes/serviceRoutes');
 const userRoutes = require('./routes/userRoutes');
-
 dotenv.config();
 connectDB();
 console.log('Email User:', process.env.EMAIL_USER);
