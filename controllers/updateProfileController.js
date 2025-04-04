@@ -15,7 +15,9 @@ const updateProfile = async (req, res) => {
   }
 
   // Update fields only if provided in the request body
-  user.name = req.body.name || user.name;
+  user.firstName = req.body.firstName || user.firstName;
+  user.lastName = req.body.lastName || user.lastName;
+  
   user.email = req.body.email || user.email;
 
 
@@ -23,7 +25,8 @@ const updateProfile = async (req, res) => {
 
   res.json({
     _id: updatedUser.id,
-    name: updatedUser.name,
+    firstName: updatedUser.firstName,
+    lastName: updatedUser.lastName,
     email: updatedUser.email,
     message: 'Profile updated successfully',
   });

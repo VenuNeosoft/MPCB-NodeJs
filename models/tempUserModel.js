@@ -1,7 +1,8 @@
 const mongoose = require('mongoose');
 
 const tempUserSchema = mongoose.Schema({
-  name: String,
+  firstName: String,
+  lastName:String,
   email: { type: String, required: true, unique: true },
   password: String,
   role: String,
