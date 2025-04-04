@@ -12,9 +12,9 @@ const generateToken = (id) => {
 // @desc Create new user with role
 // @route POST /api/users
 const createUser = async (req, res) => {
-  const { name, email, password, role } = req.body;
+  const { firstName, lastName, email, password, role } = req.body;
 
-  if (!name || !email || !password || !role) {
+  if (!firstName || !lastName || !email || !password || !role) {
     return res.status(400).json({ message: 'All fields are required' });
   }
 
@@ -35,7 +35,7 @@ const createUser = async (req, res) => {
   // Store in temporary collection instead of creating the user
   await TempUser.findOneAndUpdate(
     { email },
-    { name, email, password, role, otp, otpExpires: Date.now() + 10 * 60 * 1000 },
+    { firstName, lastName, email, password, role, otp, otpExpires: Date.now() + 10 * 60 * 1000 },
     { upsert: true, new: true }
   );
 
@@ -61,7 +61,8 @@ const verifyOtp = async (req, res) => {
 
   // Create user in actual collection
   const user = await User.create({
-    name: tempUser.name,
+    firstName: tempUser.firstName,
+    lastName: tempUser.lastName,
     email: tempUser.email,
     password: tempUser.password,
     role: tempUser.role,
@@ -76,7 +77,8 @@ const verifyOtp = async (req, res) => {
 
   res.status(200).json({
     _id: user.id,
-    name: user.name,
+    firstName: user.firstName,
+    lastName: user.lastName,
     email: user.email,
     role: user.role,
     token,
