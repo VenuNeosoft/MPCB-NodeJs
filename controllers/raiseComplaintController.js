@@ -1,5 +1,8 @@
 const Complaint = require('../models/complaintModel');
 const Notification = require('../models/notificationModel');
+const admin = require('../firebase');
+const notificationController = require('../controllers/notificationController'); // Rename import
+
 // @desc Raise a complaint
 // @route POST /api/complaints/raise
 const raiseComplaint = async (req, res) => {
@@ -31,15 +34,9 @@ const raiseComplaint = async (req, res) => {
       status: 'pending',
       response: '',
     });
-    await Notification.create({
-      user: citizen,
-      message: `New complaint created: "${title}"`,
-    });
-
-    await Notification.create({
-      user: supervisorId,
-      message: `New complaint assigned: "${title}"`,
-    });
+ 
+    await notificationController.createNotification(citizen, `New complaint created: "${title}"`);
+    await notificationController.createNotification(supervisorId, `New complaint assigned: "${title}"`);
 
     res.status(201).json({
       message: 'Complaint raised successfully',

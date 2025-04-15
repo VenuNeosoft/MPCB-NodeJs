@@ -1,24 +1,46 @@
 const Notification = require('../models/notificationModel');
-
+const admin = require('../firebase');
+const User = require('../models/userModel'); 
 // Create a new notification
-const createNotification = async (req, res) => {
-    const {  user, message } = req.body;
-  
-    if (( !user) || !message) {
-      return res.status(400).json({ message: 'User ID and message are required' });
+const createNotification = async (user, message, deviceToken = null) => {
+  if (!user || !message) {
+    throw new Error('User ID and message are required');
+  }
+
+  try {
+    // Create the notification in the database
+    const notification = await Notification.create({
+      user,
+      message,
+    });
+   
+    if (deviceToken == null) {
+      const userRecord = await User.findById(user);
+      deviceToken = userRecord.deviceToken;
+      console.log('Fetched deviceToken from database:', deviceToken);  // Debug log
     }
-  
-    try {
-      const notification = await Notification.create({
-        user: user,
-        message,
-      });
-      res.status(201).json({ message: 'Notification created', notification });
-    } catch (error) {
-      res.status(500).json({ message: error.message });
+    console.log(deviceToken);
+   
+
+    if (deviceToken) {
+      // Send FCM notification if device token is available
+      const payload = {
+        notification: {
+          title: 'New Notification',
+          body: message,
+        },
+        token: deviceToken,
+      };
+      await admin.messaging().send(payload);
     }
-  };
-  
+
+    return notification;
+  } catch (error) {
+console.log(error.message);
+    throw new Error(error.message);
+  }
+};
+
 // Get all notifications for the logged-in user
 const getUserNotifications = async (req, res) => {
   try {

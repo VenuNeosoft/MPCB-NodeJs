@@ -12,13 +12,13 @@ const generateToken = (id) => {
 // @desc Login user and get token
 // @route POST /api/users/login
 const loginUser = async (req, res) => {
-  const { email, password ,role} = req.body;
+  const { email, password, role, deviceToken } = req.body;
+
   if (!email || !password || !role) {
     res.status(400).json({ message: 'All fields are required' });
     return;
   }
 
-  // Check if user exists
   const user = await User.findOne({ email });
   if (!user || user.role !== role) {
     res.status(401).json({ message: 'Invalid email or role mismatch' });
@@ -26,8 +26,13 @@ const loginUser = async (req, res) => {
   }
 
   const isMatch = await bcrypt.compare(password, user.password);
-  if (user && isMatch) {
-    // Generate token if everything is correct
+  if (isMatch) {
+    // Update the deviceToken when the user logs in
+    if (deviceToken) {
+      user.deviceToken = deviceToken;
+      await user.save();
+    }
+
     const token = generateToken(user._id);
 
     res.json({
@@ -35,9 +40,8 @@ const loginUser = async (req, res) => {
       id: user.id,
       firstName: user.firstName,
       lastName: user.lastName,
-     
       email: user.email,
-      role: user.role, // Return role in response
+      role: user.role,
       token,
     });
   } else {

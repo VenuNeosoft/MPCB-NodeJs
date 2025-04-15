@@ -1,5 +1,5 @@
 const User = require('../models/userModel');
-
+const notificationController = require('../controllers/notificationController'); 
 // @desc Update user profile
 // @route PUT /api/users/updateprofile
 // @access Private
@@ -22,10 +22,10 @@ const updateProfile = async (req, res) => {
 
 
   const updatedUser = await user.save();
-  await Notification.create({
-    user: user.id,
-    message: `Your profile has been updated successfully`,
-  });
+  await notificationController.createNotification(
+   user.id,
+ `Your profile has been updated successfully`,
+  );
   res.json({
     _id: updatedUser.id,
     firstName: updatedUser.firstName,

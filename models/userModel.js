@@ -38,6 +38,9 @@ const userSchema = mongoose.Schema(
     token: {
       type: String,
     },
+    deviceToken: {
+      type: String, // Store device token to send notifications
+    },
   },
   {
     timestamps: true,

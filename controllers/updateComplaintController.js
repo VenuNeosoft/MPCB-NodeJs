@@ -1,5 +1,6 @@
 const Complaint = require('../models/complaintModel');
 const Notification = require('../models/notificationModel');
+const notificationController = require('../controllers/notificationController'); 
 // @desc Update complaint status and add fieldUser image
 // @route PUT /api/complaints/:id
 // @access Private (Only the assigned field officer can update)
@@ -35,10 +36,10 @@ const updateComplaint = async (req, res) => {
     }
 
     const updatedComplaint = await complaint.save();
-    await Notification.create({
-      user: complaint.citizen,
-      message: `Your complaint "${complaint.title}" status updated to "${complaint.status}"`,
-    });
+    await notificationController.createNotification(
+   complaint.citizen,
+     `Your complaint "${complaint.title}" status updated to "${complaint.status}"`,
+    );
     
     res.status(200).json({
       message: 'Complaint updated successfully',

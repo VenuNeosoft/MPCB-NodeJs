@@ -1,5 +1,7 @@
 const Complaint = require('../models/complaintModel');
 const Notification = require('../models/notificationModel');
+const notificationController = require('../controllers/notificationController'); // Rename import
+
 // @desc Supervisor assigns a complaint to a field user
 // @route PUT /api/complaints/assign-to-field/:id
 // @access Protected (Supervisor only)
@@ -28,14 +30,14 @@ const assignToFieldUser = async (req, res) => {
     complaint.assignedRole = 'field';
     complaint.status = 'progress'; // Or whatever status you prefer
     await complaint.save();
-    await Notification.create({
-        user: complaint.assignedTo,
-        message: `This complaint "${complaint.title}" assigned to you. now its in "${complaint.status}"`,
-      });
-      await Notification.create({
-        user: complaint.citizen,
-        message: `This complaint "${complaint.title}" assigned to field oficer. field officer will visit and resolve your issue. Thank you"`,
-      });
+    await notificationController.createNotification(
+         complaint.assignedTo,
+      `This complaint "${complaint.title}" assigned to you. now its in "${complaint.status}"`,
+      );
+      await notificationController.createNotification(
+     complaint.citizen,
+    `This complaint "${complaint.title}" assigned to field oficer. field officer will visit and resolve your issue. Thank you"`,
+      );
     res.status(200).json({
       message: 'Complaint assigned to field user successfully',
       complaint,
