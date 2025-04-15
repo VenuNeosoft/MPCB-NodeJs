@@ -16,7 +16,7 @@ const serviceRoute = require('./routes/serviceRoutes');
 const userRoutes = require('./routes/userRoutes');
 const forgotPasswordRoutes = require('./routes/forgotPasswordRoutes');
 const notificationRoutes = require('./routes/notificationRoutes');
-const firebase = require('./firebase');
+
 
 dotenv.config();
 connectDB();
