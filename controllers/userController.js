@@ -5,26 +5,40 @@ const User = require('../models/userModel');
 // @route GET /api/users
 const getFieldUsers = async (req, res) => {
   try {
-    // Find all users with the role 'field'
     const fieldUsers = await User.find({ role: 'field' });
 
-    // If no field users are found
     if (fieldUsers.length === 0) {
       return res.status(404).json({ message: 'No field users found' });
     }
 
-    // Return the list of field users
-    res.status(500).json({
-      status: 'success',  // You can use success as a status message
-      message: 'field users  retrieved successfully',
+    res.status(200).json({
+      status: 'success',
+      message: 'Field users retrieved successfully',
       body: fieldUsers,
     });
   } catch (error) {
     res.status(500).json({ message: 'Error fetching field users', error });
   }
 };
+const getSupervisors = async (req, res) => {
+  try {
+    const supervisors = await User.find({ role: 'supervisor' });
+
+    if (supervisors.length === 0) {
+      return res.status(404).json({ message: 'No supervisors found' });
+    }
+
+    res.status(200).json({
+      status: 'success',
+      message: 'Supervisors retrieved successfully',
+      body: supervisors,
+    });
+  } catch (error) {
+    res.status(500).json({ message: 'Error fetching supervisors', error });
+  }
+};
 
 module.exports = {
-  
-  getFieldUsers
+  getFieldUsers,
+  getSupervisors,
 };

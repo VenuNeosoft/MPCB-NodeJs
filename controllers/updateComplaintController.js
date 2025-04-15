@@ -1,5 +1,5 @@
 const Complaint = require('../models/complaintModel');
-
+const Notification = require('../models/notificationModel');
 // @desc Update complaint status and add fieldUser image
 // @route PUT /api/complaints/:id
 // @access Private (Only the assigned field officer can update)
@@ -14,23 +14,32 @@ const updateComplaint = async (req, res) => {
       return res.status(404).json({ message: 'Complaint not found' });
     }
 
-    // ✅ Check if the logged-in user is assigned to this complaint
     if (!complaint.assignedTo || complaint.assignedTo.toString() !== req.user.id) {
-      return res.status(403).json({ message: 'Forbidden: You are not assigned to this complaint' });
+      return res.status(403).json({ message: 'Forbidden: Not assigned to you' });
     }
 
-    // Update complaint fields
     complaint.status = status || complaint.status;
     complaint.response = response || complaint.response;
 
-    // Check if fieldUser uploaded an image
-    if (req.file) {
-      complaint.fieldUserImage = `${req.protocol}://${req.get('host')}/uploads/${req.file.filename}`;
+    // Handle multiple images
+    if (req.files && req.files.length > 0) {
+      const imagePaths = req.files.map(file => `${req.protocol}://${req.get('host')}/uploads/${file.filename}`);
+
+      if (status === 'progress') {
+        complaint.progressImages.push(...imagePaths);
+      } else if (status === 'completed') {
+        complaint.completedImages.push(...imagePaths);
+      } else if (status === 'escalated') {
+        complaint.escalatedImages.push(...imagePaths);
+      }
     }
 
-    // Save updated complaint
     const updatedComplaint = await complaint.save();
-
+    await Notification.create({
+      user: complaint.citizen,
+      message: `Your complaint "${complaint.title}" status updated to "${complaint.status}"`,
+    });
+    
     res.status(200).json({
       message: 'Complaint updated successfully',
       complaint: updatedComplaint,
@@ -39,6 +48,7 @@ const updateComplaint = async (req, res) => {
     res.status(500).json({ message: 'Error updating complaint', error });
   }
 };
+
 const updateComplaintBySupervisor = async (req, res) => {
   const { status, response } = req.body;
   const complaintId = req.params.id;

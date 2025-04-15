@@ -1,11 +1,11 @@
 const Complaint = require('../models/complaintModel');
-
+const Notification = require('../models/notificationModel');
 // @desc Raise a complaint
 // @route POST /api/complaints/raise
 const raiseComplaint = async (req, res) => {
-  const { title, description, citizen,serviceName,issueName,filedUserId } = req.body;
+  const { title, description, citizen, serviceName, issueName, supervisorId } = req.body;
 
-  if (!title || !description || !citizen) {
+  if (!title || !description || !citizen || !supervisorId) {
     return res.status(400).json({ message: 'All fields are required' });
   }
 
@@ -22,13 +22,23 @@ const raiseComplaint = async (req, res) => {
       citizen,
       citizenImage,
       serviceName,
-    issueName,
-  
+      issueName,
+
 
       fieldUserImage: '',
-      assignedTo: filedUserId,
+      assignedTo: supervisorId,
+      assignedRole: 'supervisor',
       status: 'pending',
       response: '',
+    });
+    await Notification.create({
+      user: citizen,
+      message: `New complaint created: "${title}"`,
+    });
+
+    await Notification.create({
+      user: supervisorId,
+      message: `New complaint assigned: "${title}"`,
     });
 
     res.status(201).json({

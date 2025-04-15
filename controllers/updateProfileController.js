@@ -22,7 +22,10 @@ const updateProfile = async (req, res) => {
 
 
   const updatedUser = await user.save();
-
+  await Notification.create({
+    user: user.id,
+    message: `Your profile has been updated successfully`,
+  });
   res.json({
     _id: updatedUser.id,
     firstName: updatedUser.firstName,

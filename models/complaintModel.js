@@ -34,12 +34,22 @@ const complaintSchema = mongoose.Schema(
       assignedTo: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User', // Field user assigned to complaint
+        required: true,
+      },
+      assignedRole: {
+        type: String,
+        enum: ['field', 'supervisor'],
+        required: true,
       },
     status: {
       type: String,
-      enum: ['pending', 'approved', 'rejected', 'completed'],
+      enum: ['pending', 'approved', 'escalated', 'completed','progress'],
       default: 'pending',
     },
+    progressImages: [{ type: String }],
+completedImages: [{ type: String }],
+escalatedImages: [{ type: String }],
+
     response: {
       type: String,
       default: '',

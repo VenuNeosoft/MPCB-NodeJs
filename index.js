@@ -15,6 +15,7 @@ const path = require('path');
 const serviceRoute = require('./routes/serviceRoutes');
 const userRoutes = require('./routes/userRoutes');
 const forgotPasswordRoutes = require('./routes/forgotPasswordRoutes');
+const notificationRoutes = require('./routes/notificationRoutes');
 dotenv.config();
 connectDB();
 console.log('Email User:', process.env.EMAIL_USER);
@@ -37,7 +38,7 @@ app.use('/api/complaints', complaintRoutes);
 app.use('/api/issues', serviceRoute);
 app.use('/api/users', userRoutes);
 app.use('/api/users', forgotPasswordRoutes);
-
+app.use('/api/notifications', notificationRoutes);
 // Serve uploaded images dynamically
 
 
