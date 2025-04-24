@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Complaints</title>
+  <link rel="stylesheet" href="/css/admin.css">
+  <link rel="stylesheet" href="/css/users.css">
+</head>
+<body>
+  <div class="container">
+    <nav class="sidebar">
+      <h2>Admin Panel</h2>
+      <ul>
+        <li><a href="/admin/dashboard">Dashboard</a></li>
+        <li><a href="/admin/complaints">Complaints</a></li>
+        <li><a href="/admin/supervisors">Supervisors</a></li>
+        <li><a href="/admin/field-officers">Field Officers</a></li>
+        <li><a href="/admin/settings">Settings</a></li>
+        <li><a href="/admin/logout">Logout</a></li>
+      </ul>
+    </nav>
+
+    <div class="main-content">
+      <h1>Complaints</h1>
+
+      <table>
+        <thead>
+          <tr>
+            <th>Complaint ID</th>
+            <th>Description</th>
+            <th>Status</th>
+            <th>serviceName</th>
+            <th>AssignedRole</th>
+            <th>citizen</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% complaints.forEach((complaint) => { %>
+            <tr>
+              <td><%= complaint._id %></td>
+              <td><%= complaint.description %></td>
+              <td><%= complaint.status %></td>
+              <td><%= complaint.serviceName %></td>
+              <td><%= complaint.assignedRole %></td>
+              <td><%= complaint.citizen %></td>
+              <td>
+                <a href="/admin/complaints/<%= complaint._id %>/edit">Edit</a>
+                <a href="/admin/complaints/<%= complaint._id %>/delete" onclick="return confirm('Are you sure?')">Delete</a>
+              </td>
+            </tr>
+          <% }); %>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <script src="/scripts.js"></script>
+</body>
+</html>

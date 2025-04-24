@@ -1,0 +1,232 @@
+admin.css.forms {
+    padding: 20px;
+  }
+  
+  .forms form {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    max-width: 400px;
+  }
+  
+  .forms input, .forms select {
+    padding: 8px;
+    font-size: 16px;
+  }
+  /* Table styling */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+  }
+  
+  table th, table td {
+    padding: 10px;
+    text-align: left;
+    border: 1px solid #ddd; /* Adding borders */
+  }
+  
+  table th {
+    background-color: #f4f4f4;
+    font-weight: bold;
+  }
+  
+  table tr:nth-child(even) {
+    background-color: #f9f9f9;
+  }
+  
+  table tr:hover {
+    background-color: #f1f1f1;
+  }
+   /* Your existing CSS for table with borders */
+
+
+  table th, table td {
+    padding: 10px;
+    text-align: left;
+    border: 1px solid #ddd;
+  }
+
+  table th {
+    background-color: #f4f4f4;
+    font-weight: bold;
+  }
+
+  table tr:nth-child(even) {
+    background-color: #f9f9f9;
+  }
+
+  table tr:hover {
+    background-color: #f1f1f1;
+  }
+  table td:last-child, table th:last-child {
+    text-align: center;
+    white-space: nowrap;
+    width: 150px; /* You can adjust this width */
+  }
+  
+  table td:last-child button {
+    margin-right: 5px;
+    padding: 6px 10px;
+    font-size: 14px;
+  }
+  
+/* Modal styling */
+.modal {
+display: none; /* Hidden by default */
+position: fixed;
+z-index: 1;
+left: 0;
+top: 0;
+width: 100%;
+height: 100%;
+overflow: auto;
+background-color: rgba(0, 0, 0, 0.4);
+padding-top: 60px;
+}
+
+.modal-content {
+background-color: #fefefe;
+margin: 5% auto;
+padding: 20px;
+border: 1px solid #888;
+width: 80%;
+max-width: 500px;
+box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+display: flex;
+flex-direction: column; /* Add flexbox for vertical alignment */
+align-items: stretch;  /* Make sure all content stretches to fit the modal */
+}
+
+.modal-header {
+font-size: 24px;
+font-weight: bold;
+margin-bottom: 10px;
+text-align: center;  /* Center the header */
+}
+
+.modal-body {
+margin-bottom: 20px;
+display: flex;
+flex-direction: column;
+gap: 10px;  /* Added gap between elements */
+}
+
+.modal-body label {
+font-weight: bold;
+margin-bottom: 5px; /* Space between label and input */
+}
+
+.modal-body input,
+.modal-body select {
+padding: 10px;
+font-size: 16px;
+border: 1px solid #ddd;
+border-radius: 5px;
+}
+
+button[type="submit"] {
+padding: 12px;
+background-color: #4CAF50;
+color: white;
+border: none;
+border-radius: 5px;
+font-size: 16px;
+cursor: pointer;
+margin-top: 10px; /* Add spacing above button */
+}
+
+button[type="submit"]:hover {
+background-color: #45a049;
+}
+
+.close {
+color: #aaa;
+float: right;
+font-size: 28px;
+font-weight: bold;
+}
+
+.close:hover,
+.close:focus {
+color: black;
+text-decoration: none;
+cursor: pointer;
+}
+
+/* Style for status message */
+#formStatusMessage {
+margin-top: 10px;
+text-align: center;
+font-weight: bold;
+}
+.table-actions {
+    display: flex;
+    justify-content: space-between; /* Spread the items across the full width */
+    align-items: center;  /* Vertically align them */
+    margin-bottom: 20px; /* Add spacing between the search bar and table */
+  }
+  
+  .search-form {
+    display: flex;
+    gap: 10px;  /* Space between the search input and search button */
+    flex-grow: 1;  /* Allow this section to take up available space */
+  }
+  
+  .search-bar {
+    width: 100%;
+    max-width: 300px;  /* Set a max width for the search bar */
+    padding: 10px;
+    font-size: 16px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    height: 40px; /* Explicit height to match the button */
+    box-sizing: border-box; /* Ensure padding is included in the height calculation */
+  }
+ 
+.search-btn {
+    padding: 10px 15px;
+    font-size: 16px;
+    cursor: pointer;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    height: 40px;  /* Set height to 40px to match the search input */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .search-btn:hover {
+    background-color: #0056b3;
+  }
+  
+  .create-user-btn {
+    padding: 10px 15px;
+    font-size: 16px;
+    cursor: pointer;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    transition: background-color 0.3s ease;
+  }
+  
+  .create-user-btn:hover {
+    background-color: #45a049;
+  }
+  
+  button[type="submit"] {
+    padding: 10px 15px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+  
+  button[type="submit"]:hover {
+    background-color: #0056b3;
+  }
+  

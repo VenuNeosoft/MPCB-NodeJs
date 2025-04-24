@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Dashboard</title>
+  <link rel="stylesheet" href="/css/admin.css">
+  <!-- Include Chart.js for charts -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+  <div class="container">
+    <!-- Sidebar -->
+    <nav class="sidebar">
+      <div class="sidebar-header">
+        <h2>Admin Panel</h2>
+      </div>
+      <ul>
+        <li><a href="/admin/dashboard">Dashboard</a></li>
+        <li><a href="/admin/complaints">Complaints</a></li>
+        <li><a href="/admin/supervisors">Supervisors</a></li>
+        <li><a href="/admin/field-officers">Field Officers</a></li>
+        <li><a href="/admin/settings">Settings</a></li>
+
+        <li><a href="/admin/logout">Logout</a></li>
+        
+      </ul>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="main-content">
+      <header>
+        <h1>Welcome, <%= user.firstName %></h1>
+      </header>
+
+      <!-- Top Charts -->
+      <section class="charts">
+        <div class="chart-container">
+          <h3>Complaints Overview</h3>
+          <canvas id="complaintsChart"></canvas>
+        </div>
+        <div class="chart-container">
+          <h3>Supervisors Overview</h3>
+          <canvas id="usersChart" width="200" height="100"></canvas>
+        </div>
+      </section>
+
+      <!-- Complaints Table -->
+      <section class="tables">
+        <h2>Complaints</h2>
+        <table>
+          <thead>
+            <tr>
+              <th>Complaint ID</th>
+              <th>Description</th>
+              <th>Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% complaints.forEach((complaint) => { %>
+              <tr>
+                <td><%= complaint._id %></td>
+                <td><%= complaint.description %></td>
+                <td><%= complaint.status %></td>
+                <td>
+                  <a href="/admin/complaints/<%= complaint._id %>/edit">Edit</a>
+                  <a href="/admin/complaints/<%= complaint._id %>/delete" onclick="return confirm('Are you sure?')">Delete</a>
+                </td>
+              </tr>
+            <% }); %>
+          </tbody>
+        </table>
+
+        <!-- Supervisors Table -->
+        <h2>Supervisors</h2>
+        <table>
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Email</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% supervisors.forEach((supervisor) => { %>
+              <tr>
+                <td><%= supervisor.firstName %> <%= supervisor.lastName %></td>
+                <td><%= supervisor.email %></td>
+                <td><a href="/admin/supervisors/<%= supervisor._id %>/edit">Edit</a></td>
+              </tr>
+            <% }); %>
+          </tbody>
+        </table>
+      </section>
+    </div>
+  </div>
+  <div id="data-container" 
+  data-pending="<%= pendingCount %>"
+  data-progress="<%= progressCount %>"
+  data-completed="<%= completedCount %>"
+  data-escalated="<%= escalatedCount %>"
+  data-approved="<%= approvedCount %>"
+  data-supervisors="<%= activeSupervisorsCount%>"
+  data-field-officers="<%= fieldOfficersCount %>"
+  data-citizens="<%= citizensCount %>"
+  >
+</div>
+  <script src="/scripts.js"></script>
+  <script>
+   var dataContainer = document.getElementById('data-container');
+   var pendingCount = parseInt(dataContainer.getAttribute('data-pending'));
+    var progressCount = parseInt(dataContainer.getAttribute('data-progress'));
+    var completedCount = parseInt(dataContainer.getAttribute('data-completed'));
+    var escalatedCount = parseInt(dataContainer.getAttribute('data-escalated'));
+    var approvedCount = parseInt(dataContainer.getAttribute('data-approved'));
+
+    // Chart.js configuration for Complaints Chart
+    
+    var complaintsCtx = document.getElementById('complaintsChart').getContext('2d');
+    var complaintsChart = new Chart(complaintsCtx, {
+      type: 'bar',
+      data: {
+        labels: ['Pending', 'Progress', 'Completed','Escalated','Approved'], // Example categories
+        datasets: [{
+          label: 'Complaints Overview',
+          data: [pendingCount, progressCount, completedCount, escalatedCount, approvedCount],
+          backgroundColor: 'rgba(75, 192, 192, 0.2)',
+          borderColor: 'rgba(75, 192, 192, 1)',
+          borderWidth: 1
+        }]
+      },
+      options: {
+        scales: {
+          y: {
+            beginAtZero: true
+          }
+        }
+      }
+    });
+    var supervisorsCount = parseInt(dataContainer.getAttribute('data-supervisors'));
+  var fieldOfficersCount = parseInt(dataContainer.getAttribute('data-field-officers'));
+  var citizensCount = parseInt(dataContainer.getAttribute('data-citizens'));
+  var usersCtx = document.getElementById('usersChart').getContext('2d');
+  var usersChart = new Chart(usersCtx, {
+    type: 'pie',
+    data: {
+      labels: ['Supervisors', 'Field Officers', 'Citizens'], // Categories
+      datasets: [{
+        label: 'Users Overview',
+        data: [supervisorsCount, fieldOfficersCount, citizensCount], // Counts from data attributes
+        backgroundColor: ['#36A2EB', '#FF6384', '#FFCD56'],
+        borderWidth: 1
+      }]
+    },
+    options: {
+      responsive: true,
+      plugins: {
+        legend: {
+          position: 'top'
+        },
+      }
+    }
+  });
+  </script>
+</body>
+</html>

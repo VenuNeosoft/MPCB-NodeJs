@@ -1,0 +1,10 @@
+<h2>All Users</h2>
+<table>
+  <tr><th>Name</th><th>Role</th></tr>
+  <% users.forEach(user => { %>
+    <tr>
+      <td><%= user.name %></td>
+      <td><%= user.role %></td>
+    </tr>
+  <% }) %>
+</table>

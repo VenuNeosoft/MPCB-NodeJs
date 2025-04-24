@@ -16,6 +16,11 @@ const serviceRoute = require('./routes/serviceRoutes');
 const userRoutes = require('./routes/userRoutes');
 const forgotPasswordRoutes = require('./routes/forgotPasswordRoutes');
 const notificationRoutes = require('./routes/notificationRoutes');
+const session = require('express-session');
+const MongoStore = require('connect-mongo');
+
+const adminRoutes = require('./routes/adminRoutes');
+const sessionMiddleware = require('./middleware/session');
 
 
 dotenv.config();
@@ -25,11 +30,18 @@ console.log('Email Pass:', process.env.EMAIL_PASS);
 
 
 const app = express();
+app.use(sessionMiddleware);
+app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.json());
+app.use(express.urlencoded({ extended: true })); 
+
 app.get('/', (req, res) => {
     res.send('Welcome to our site');
   });
+  app.set('view engine', 'ejs');
+  app.set('views', path.join(__dirname, 'views'));
   
+
 // Routes
 app.use('/api/users', createUserRoute);
 app.use('/api/users', getUserRoute);
@@ -41,6 +53,10 @@ app.use('/api/issues', serviceRoute);
 app.use('/api/users', userRoutes);
 app.use('/api/users', forgotPasswordRoutes);
 app.use('/api/notifications', notificationRoutes);
+app.use('/admin', adminRoutes);
+
+// app.use('/admin', require('./routes/admin'));
+
 // Serve uploaded images dynamically
 
 

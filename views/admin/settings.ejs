@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Settings - User Management</title>
+  <link rel="stylesheet" href="/css/users.css" />
+  <link rel="stylesheet" href="/css/admin.css" />
+
+</head>
+<body>
+  <div class="container">
+    <nav class="sidebar">
+      <div class="sidebar-header">
+        <h2>Admin Panel</h2>
+      </div>
+      <ul>
+        <li><a href="/admin/dashboard">Dashboard</a></li>
+        <li><a href="/admin/complaints">Complaints</a></li>
+        <li><a href="/admin/supervisors">Supervisors</a></li>
+        <li><a href="/admin/field-officers">Field Officers</a></li>
+        <li><a href="/admin/settings">Settings</a></li>
+        <li><a href="/admin/logout">Logout</a></li>
+      </ul>
+    </nav>
+
+    <div class="main-content">
+      <header><h1>Settings - User Management</h1></header>
+
+      <div class="table-container">
+        <div class="table-actions">
+            <form method="GET" action="/admin/settings" class="search-form">
+              <input type="text" name="search" class="search-bar" placeholder="Search users..." value="<%= searchQuery || '' %>" />
+              <button type="submit" class="search-btn">Search</button>
+            </form>
+            <button type="button" class="create-user-btn" id="createUserBtn">➕ Create Account</button>
+          </div>
+        <table>
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Role</th>
+              <th>Email</th>
+              <th>Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% users.forEach(user => { %>
+              <tr>
+                <td><%= user.firstName %> <%= user.lastName %></td>
+                <td><%= user.role %></td>
+                <td><%= user.email %></td>
+                <td><%= user.status || 'Active' %></td>
+                <td>
+                    <button class="edit-btn" data-id="<%= user._id %>" data-user='<%- JSON.stringify(user) %>'>Edit</button>
+                    <button class="delete-btn" data-id="<%= user._id %>">Delete</button>
+                    
+                  </td>
+              </tr>
+            <% }) %>
+          </tbody>
+        </table>
+
+        <div class="pagination">
+          <button <%= currentPage <= 1 ? 'disabled' : '' %>><a href="/admin/settings?page=<%= currentPage - 1 %>">«</a></button>
+          <button class="active"><%= currentPage %></button>
+          <button <%= currentPage >= totalPages ? 'disabled' : '' %>><a href="/admin/settings?page=<%= currentPage + 1 %>">»</a></button>
+        </div>
+      </div>
+
+      <!-- Modal for creating new user -->
+      <div id="createUserModal" class="modal">
+        <div class="modal-content">
+          <span class="close" id="closeModalBtn">&times;</span>
+          <div class="modal-header">Create New User</div>
+          <form id="createUserForm" action="/admin/create-user" method="POST">
+            <div class="modal-body">
+              <label>First Name</label>
+              <input type="text" name="firstName" required />
+              <label>Last Name</label>
+              <input type="text" name="lastName" required />
+              <label>Email</label>
+              <input type="email" name="email" required />
+              <label>Password</label>
+              <input type="password" name="password" required />
+              <label>Role</label>
+              <select name="role" required>
+                <option value="citizen">Citizen</option>
+                <option value="supervisor">Supervisor</option>
+                <option value="field">Field Officer</option>
+              </select>
+            </div>
+            <button type="submit">Create User</button>
+          </form>
+          <div id="formStatusMessage"></div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+  <div id="editUserModal" class="modal">
+    <div class="modal-content">
+      <span class="close" id="closeEditModalBtn">&times;</span>
+      <div class="modal-header">Edit User</div>
+      <form id="editUserForm" method="POST">
+        <input type="hidden" name="id" id="editUserId" />
+        <div class="modal-body">
+          <label>First Name</label>
+          <input type="text" name="firstName" id="editFirstName" required />
+          <label>Last Name</label>
+          <input type="text" name="lastName" id="editLastName" required />
+          <label>Email</label>
+          <input type="email" name="email" id="editEmail" required />
+          <label>Role</label>
+          <select name="role" id="editRole" required>
+            <option value="citizen">Citizen</option>
+            <option value="supervisor">Supervisor</option>
+            <option value="field">Field Officer</option>
+          </select>
+        </div>
+        <button type="submit">Save Changes</button>
+      </form>
+      <div id="editFormStatusMessage"></div>
+    </div>
+  </div>
+  <script>
+    const editUserModal = document.getElementById("editUserModal");
+    const closeEditModalBtn = document.getElementById("closeEditModalBtn");
+    const editUserForm = document.getElementById("editUserForm");
+  
+    document.querySelectorAll(".edit-btn").forEach(button => {
+      button.addEventListener("click", () => {
+        const user = JSON.parse(button.getAttribute("data-user"));
+  
+        document.getElementById("editUserId").value = user._id;
+        document.getElementById("editFirstName").value = user.firstName;
+        document.getElementById("editLastName").value = user.lastName;
+        document.getElementById("editEmail").value = user.email;
+        document.getElementById("editRole").value = user.role;
+  
+        editUserForm.action = `/admin/update-user/${user._id}`;
+        editUserModal.style.display = "block";
+      });
+    });
+  
+    closeEditModalBtn.addEventListener("click", () => {
+      editUserModal.style.display = "none";
+    });
+  
+    window.addEventListener("click", (event) => {
+      if (event.target === editUserModal) {
+        editUserModal.style.display = "none";
+      }
+    });
+  
+    editUserForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
+  
+      const formData = new FormData(editUserForm);
+      try {
+        const response = await fetch(editUserForm.action, {
+          method: 'POST',
+          body: formData
+        });
+  
+        const result = await response.text();
+  
+        if (response.ok) {
+          document.getElementById("editFormStatusMessage").innerHTML = "<p style='color: green;'>User updated successfully!</p>";
+          setTimeout(() => location.reload(), 1000);
+        } else {
+          document.getElementById("editFormStatusMessage").innerHTML = "<p style='color: red;'>Error updating user.</p>";
+        }
+  
+      } catch (error) {
+        console.error(error);
+        document.getElementById("editFormStatusMessage").innerHTML = "<p style='color: red;'>An error occurred.</p>";
+      }
+    });
+  </script>
+  
+  <script>
+    document.querySelectorAll(".delete-btn").forEach(button => {
+      button.addEventListener("click", async () => {
+        const userId = button.getAttribute("data-id");
+        const confirmed = confirm("Are you sure you want to delete this user?");
+        if (confirmed) {
+          try {
+            const response = await fetch(`/admin/delete-user/${userId}`, {
+              method: "DELETE"
+            });
+  
+            if (response.ok) {
+              alert("User deleted successfully.");
+              location.reload();
+            } else {
+              alert("Failed to delete user.");
+            }
+          } catch (err) {
+            console.error(err);
+            alert("Error occurred while deleting user.");
+          }
+        }
+      });
+    });
+
+  </script>
+  <script>
+    // Open Modal
+    const createUserBtn = document.getElementById("createUserBtn");
+    const createUserModal = document.getElementById("createUserModal");
+    const closeModalBtn = document.getElementById("closeModalBtn");
+
+    createUserBtn.addEventListener("click", () => {
+      createUserModal.style.display = "block";
+    });
+
+    closeModalBtn.addEventListener("click", () => {
+      createUserModal.style.display = "none";
+    });
+
+    window.onclick = (event) => {
+      if (event.target === createUserModal) {
+        createUserModal.style.display = "none";
+      }
+    };
+
+    // Handle form submission and show success or error message
+    const createUserForm = document.getElementById("createUserForm");
+
+    createUserForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
+
+      const formData = new FormData(createUserForm);
+      try {
+        const response = await fetch(createUserForm.action, {
+          method: 'POST',
+          body: formData
+        });
+
+        const result = await response.text();
+        
+        if (response.ok) {
+          document.getElementById("formStatusMessage").innerHTML = "<p style='color: green;'>User created successfully!</p>";
+        } else {
+          document.getElementById("formStatusMessage").innerHTML = "<p style='color: red;'>Error creating user.</p>";
+        }
+
+      } catch (error) {
+        console.error(error);
+        document.getElementById("formStatusMessage").innerHTML = "<p style='color: red;'>An error occurred. Please try again.</p>";
+      }
+    });
+  </script>
+
+</body>
+</html>
